@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using txt2obj.Variables;
+
+namespace txt2obj.Node
+{
+    public interface INode
+    {
+        Variable GetVariable(string name);
+        void SetVariable(string name, string value);
+        void Prepare();
+        string Comment { get; set; }
+    }
+}
