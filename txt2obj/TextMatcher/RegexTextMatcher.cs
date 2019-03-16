@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace txt2obj.TextMatcher
 {
-    public class RegexTextMatcher : ITestMatcher
+    public class RegexTextMatcher : ITextMatcher
     {
         public IEnumerable<TextMatch> GetMatches(string pattern, string text)
         {

@@ -18,6 +18,9 @@ namespace txt2obj.Node
 
         public Node ParentNode { get; set; }
         public string Comment { get; set; }
+        public string Target { get; set; }
+        public string Pattern { get; set; }
+        public string FromVariable { get; set; }
 
         public VariableHolder Variables = new VariableHolder();
 

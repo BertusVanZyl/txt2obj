@@ -11,5 +11,8 @@ namespace txt2obj.Node
         void SetVariable(string name, string value);
         void Prepare();
         string Comment { get; set; }
+        string Pattern { get; set; }
+        string Target { get; set; }
+        string FromVariable { get; set; }
     }
 }

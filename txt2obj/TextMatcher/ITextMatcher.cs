@@ -4,7 +4,7 @@ using System.Text;
 
 namespace txt2obj.TextMatcher
 {
-    public interface ITestMatcher
+    public interface ITextMatcher
     {
         IEnumerable<TextMatch> GetMatches(string pattern, string text);
     }
