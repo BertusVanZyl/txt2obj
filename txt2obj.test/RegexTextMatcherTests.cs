@@ -71,5 +71,21 @@ namespace txt2obj.test
             matches[3].Name.ShouldBe("capturename");
         }
 
+        [Fact]
+        public void Match005()
+        {
+            var matcher = new TextMatcher.RegexTextMatcher();
+            var matches = matcher.GetMatches("(?<v1>.*)", "123456").ToList();
+            matches.Count().ShouldBe(2);
+        }
+
+        [Fact]
+        public void Match006()
+        {
+            var matcher = new TextMatcher.RegexTextMatcher();
+            var matches = matcher.GetMatches("(?<v1>.)", "123456").ToList();
+            matches.Count().ShouldBe(12);
+        }
+
     }
 }

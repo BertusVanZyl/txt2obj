@@ -66,5 +66,24 @@ namespace txt2obj.test
             var obj = parser.Text2Object<TestObj1>(node, str);
             obj.Result.DecimalProperty.ShouldBe(3.4M);
         }
+
+        [Fact]
+        public void AnonymousType()
+        {
+            var str = "12345";
+            var a = new {A = 1};
+
+            var node = new Node.Node
+            {
+                Pattern = "12(?<v1>3)45",
+                Target = "A",
+                FromVariable = "v1"
+            };
+
+            var parser = new Parser.Parser();
+            var obj = parser.Text2Object(node, str, a);
+            obj.Result.A.ShouldBe(3);
+
+        }
     }
 }

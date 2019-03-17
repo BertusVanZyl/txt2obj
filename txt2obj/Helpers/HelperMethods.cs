@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -9,16 +10,36 @@ namespace txt2obj.Helpers
     {
         public static bool IsSimple(Type type)
         {
-            var typeInfo = type.GetTypeInfo();
-            if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
-                // nullable type, check if the nested type is simple.
-                return IsSimple(typeInfo.GetGenericArguments()[0]);
-            }
-            return typeInfo.IsPrimitive 
-                   || typeInfo.IsEnum
-                   || type.Equals(typeof(string))
-                   || type.Equals(typeof(decimal));
+            return
+                type.IsValueType ||
+                type.IsPrimitive ||
+                new Type[] {
+                    typeof(String),
+                    typeof(Decimal),
+                    typeof(DateTime),
+                    typeof(DateTimeOffset),
+                    typeof(TimeSpan),
+                    typeof(Guid)
+                }.Contains(type) ||
+                Convert.GetTypeCode(type) != TypeCode.Object;
+        }
+
+        public static bool IsCollection(Type t)
+        {
+            
+            if (t == typeof(string)) return false;
+            
+            return (
+                t.GetInterface(typeof(ICollection<>).FullName) != null
+                || t.GetInterface(typeof(IList<>).FullName) != null
+                || t.GetInterface(typeof(IEnumerable<>).FullName) != null
+            );
+            
+        }
+
+        public static Type GetCollectionType(Type t)
+        {
+            return t.GetGenericArguments().FirstOrDefault();
         }
     }
 }

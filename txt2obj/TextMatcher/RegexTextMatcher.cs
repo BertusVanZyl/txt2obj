@@ -20,11 +20,15 @@ namespace txt2obj.TextMatcher
                 foreach (var groupName in groupNames)
                 {
                     var group = m.Groups[groupName];
-                    yield return new TextMatch
+                    if (group.Index < text.Length)
                     {
-                        Name = groupName,
-                        Value = group.Value
-                    };
+                        yield return new TextMatch
+                        {
+                            Name = groupName,
+                            Value = group.Value,
+                            Position = group.Index
+                        };
+                    }
                 }
             }
         }

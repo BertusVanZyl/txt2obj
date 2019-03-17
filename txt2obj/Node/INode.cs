@@ -7,6 +7,8 @@ namespace txt2obj.Node
 {
     public interface INode
     {
+        List<INode> ChildNodes { get; set; }
+    
         Variable GetVariable(string name);
         void SetVariable(string name, string value);
         void Prepare();

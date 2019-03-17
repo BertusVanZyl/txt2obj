@@ -23,7 +23,7 @@ namespace txt2obj.test
             var parentNode = new Node.Node
             {   
                 Comment ="parentnode",
-                ChildNodes = new ObservableCollection<Node.Node>
+                ChildNodes = new List<Node.INode>
                 {
                     childNode
                 }

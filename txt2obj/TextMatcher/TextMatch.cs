@@ -8,5 +8,6 @@ namespace txt2obj.TextMatcher
     {
         public string Name { get; set; }
         public string Value { get; set; }
+        public int Position { get; set; }
     }
 }

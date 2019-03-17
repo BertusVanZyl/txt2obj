@@ -10,12 +10,13 @@ namespace txt2obj.Node
 {
     public class Node : INode
     {
-        private object _lockObj = new object();
-        public ObservableCollection<Node> ChildNodes = new ObservableCollection<Node>();
         public Node()
         {
+            this.ChildNodes = new List<INode>();
         }
-
+        private object _lockObj = new object();
+        public List<INode> ChildNodes { get; set; }
+    
         public Node ParentNode { get; set; }
         public string Comment { get; set; }
         public string Target { get; set; }
@@ -40,14 +41,14 @@ namespace txt2obj.Node
             this.ParentNode = parentNode;
             foreach (var childNode in this.ChildNodes)
             {
-                childNode.Prepare(this);
+                ((Node)childNode).Prepare(this);
             }
         }
         public void Prepare()
         {
             foreach (var childNode in this.ChildNodes)
             {
-                childNode.Prepare(this);
+                ((Node)childNode).Prepare(this);
             }
         }
     }
