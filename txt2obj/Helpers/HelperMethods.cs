@@ -37,8 +37,18 @@ namespace txt2obj.Helpers
             
         }
 
+        public static Type GetTypePropertyOrFieldType(Type t, string name)
+        {
+            var property = t.GetProperty(name);
+            return property != null ? property.PropertyType : t.GetField(name)?.FieldType;
+        }
+
         public static Type GetCollectionType(Type t)
         {
+            if (t.IsArray)
+            {
+                return t.GetElementType();
+            }
             return t.GetGenericArguments().FirstOrDefault();
         }
     }

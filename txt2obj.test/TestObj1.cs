@@ -15,5 +15,6 @@ namespace txt2obj.test
 
         public TestObj1 Complex1 { get; set; }
         public List<TestObj1> ListProperty { get; set; }
+        public TestObj1[] ArrayProperty { get; set; }
     }
 }

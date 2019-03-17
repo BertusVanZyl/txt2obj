@@ -108,8 +108,6 @@ namespace txt2obj.Parser
                         var itemContext = new ParseContext();
                         ProcessNode(childNode, match.Value, collectionType, itemContext);
                         objectsByIndex.Add(new Tuple<int,JObject>(match.Position, itemContext.JObj));
-                        //objectsByIndex.Add(match.Position, itemContext.JObj);
-                        //jArray.Add(itemContext.JObj);
                     }
                 }
             }
@@ -125,17 +123,16 @@ namespace txt2obj.Parser
 
         private void ProcessNode(INode node, string text, Type t, ParseContext context)
         {
-            //var jobj = new JObject();
             var resultText = ProcessStringAgainstNode(node, text);
             
             if (!String.IsNullOrEmpty(node.Target))
             {
-                var property = t.GetProperty(node.Target);
-                var propertyType = property.PropertyType;
+                var propertyType = Helpers.HelperMethods.GetTypePropertyOrFieldType(t, node.Target);
+                
                 if (Helpers.HelperMethods.IsSimple(propertyType))
                 {
                     //simple object, just add text
-                    context.JObj[property.Name] = resultText;
+                    context.JObj[node.Target] = resultText;
                 }
                 else
                 {
@@ -144,6 +141,7 @@ namespace txt2obj.Parser
                     if (Helpers.HelperMethods.IsCollection(propertyType))
                     {
                         ProcessCollection(node, text, propertyType, newContext);
+                        context.JObj[node.Target] = newContext.JObj[node.Target];
                     }
                     else
                     {
