@@ -38,6 +38,10 @@ namespace txt2obj.Parser
         private string ProcessStringAgainstNode(INode node, string text)
         {
             var resultText = text;
+            if (!String.IsNullOrEmpty(node.Constant))
+            {
+                resultText = node.Constant;
+            }
             if (!String.IsNullOrEmpty(node.Pattern))
             {
                 ITextMatcher matcher = new RegexTextMatcher();
@@ -76,7 +80,6 @@ namespace txt2obj.Parser
                     }
                 }
             }
-            
 
             return resultText;
         }
@@ -124,6 +127,27 @@ namespace txt2obj.Parser
         private void ProcessNode(INode node, string text, Type t, ParseContext context)
         {
             var resultText = ProcessStringAgainstNode(node, text);
+
+            if (!String.IsNullOrEmpty(node.TargetVariable))
+            {
+                if (!String.IsNullOrEmpty(node.Setter))
+                {
+                    var setterStr = node.Setter;
+                    var targetVariable = node.GetVariable(node.TargetVariable);
+                    if (targetVariable == null)
+                    {
+                        setterStr = setterStr.Replace("|OLD|", String.Empty);
+                    }
+                    else
+                    {
+                        setterStr = setterStr.Replace("|OLD|", targetVariable.Value);
+                    }
+
+                    setterStr = setterStr.Replace("|NEW|", resultText);
+                    resultText = setterStr;
+                }
+                node.SetVariable(node.TargetVariable, resultText);
+            }
             
             if (!String.IsNullOrEmpty(node.Target))
             {
@@ -131,6 +155,11 @@ namespace txt2obj.Parser
                 
                 if (Helpers.HelperMethods.IsSimple(propertyType))
                 {
+                    //if datetime, attempt to use Format to standardise the datetime into ISO 8601
+                    if (!String.IsNullOrEmpty(node.Format) && Helpers.HelperMethods.IsDateTime(propertyType))
+                    {
+                        resultText = Helpers.HelperMethods.StandardiseDateTime(resultText, node.Format, propertyType);
+                    }
                     //simple object, just add text
                     context.JObj[node.Target] = resultText;
                 }
@@ -153,6 +182,16 @@ namespace txt2obj.Parser
                         context.Errors.AddRange(newContext.Errors);
                     }
                 }
+            }
+            else
+            {
+                //var newContext = new ParseContext();
+                foreach (var childNode in node.ChildNodes)
+                {
+                    ProcessNode(childNode, resultText, t, context);
+                }
+                //context.JObj[node.Target] = newContext.JObj;
+                //context.Errors.AddRange(newContext.Errors);
             }
         }
     }

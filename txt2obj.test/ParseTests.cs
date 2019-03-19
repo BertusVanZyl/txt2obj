@@ -83,7 +83,42 @@ namespace txt2obj.test
             var parser = new Parser.Parser();
             var obj = parser.Text2Object(node, str, a);
             obj.Result.A.ShouldBe(3);
+        }
 
+        [Fact]
+        public void DateTimeNoFormatter()
+        {
+            var str = "aaa2019-02-03 11:33:44bbb";
+            var node = new Node.Node
+            {
+                Pattern = "aaa(?<dt>.*?)bbb",
+                Target = "DateTimeProperty",
+                FromVariable = "dt"
+            };
+            var parser = new Parser.Parser();
+            var obj = parser.Text2Object<TestObj1>(node, str);
+
+        }
+
+        [Fact]
+        public void DateTimeWithFormatter()
+        {
+            var str = "aaa02-2019-03 11:33:44bbb";
+            var node = new Node.Node
+            {
+                Pattern = "aaa(?<dt>.*?)bbb",
+                Target = "DateTimeProperty",
+                FromVariable = "dt",
+                Format = "MM-yyyy-dd HH:ss:mm"
+            };
+            var parser = new Parser.Parser();
+            var obj = parser.Text2Object<TestObj1>(node, str);
+            obj.Result.DateTimeProperty.Year.ShouldBe(2019);
+            obj.Result.DateTimeProperty.Month.ShouldBe(02);
+            obj.Result.DateTimeProperty.Day.ShouldBe(03);
+            obj.Result.DateTimeProperty.Hour.ShouldBe(11);
+            obj.Result.DateTimeProperty.Minute.ShouldBe(44);
+            obj.Result.DateTimeProperty.Second.ShouldBe(33);
         }
     }
 }

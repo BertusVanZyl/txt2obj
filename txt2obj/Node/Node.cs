@@ -22,6 +22,10 @@ namespace txt2obj.Node
         public string Target { get; set; }
         public string Pattern { get; set; }
         public string FromVariable { get; set; }
+        public string TargetVariable { get; set; }
+        public string Format { get; set; }
+        public string Setter { get; set; }
+        public string Constant { get; set; }
 
         public VariableHolder Variables = new VariableHolder();
 
@@ -33,7 +37,16 @@ namespace txt2obj.Node
 
         public void SetVariable(string name, string value)
         {
-            this.Variables[name] = new Variable(name,value);
+            //find a variable from parents first. If it exists, update that variable rather than creating a new one on this node
+            var foundInParentTree = this.GetVariable(name);
+            if (foundInParentTree != null)
+            {
+                foundInParentTree.Value = value;
+            }
+            else
+            {
+                this.Variables[name] = new Variable(name, value);
+            }
         }
 
         private void Prepare(Node parentNode)

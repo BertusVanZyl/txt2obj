@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 
@@ -34,7 +35,24 @@ namespace txt2obj.Helpers
                 || t.GetInterface(typeof(IList<>).FullName) != null
                 || t.GetInterface(typeof(IEnumerable<>).FullName) != null
             );
-            
+        }
+
+        public static bool IsDateTime(Type t)
+        {
+            return t == typeof(DateTime); //TODO: support DateTimeOffset and other date objects
+        }
+
+        public static string StandardiseDateTime(string str, string format, Type t)
+        {
+            if (t == typeof(DateTime))
+            {
+                var dateTimeObj = DateTime.ParseExact(str, format, CultureInfo.InvariantCulture);
+                //convert to ISO 8601. Should be parsable by almost anything
+                var isoDateString = dateTimeObj.ToString("o");
+                return isoDateString;
+            }
+
+            return str;
         }
 
         public static Type GetTypePropertyOrFieldType(Type t, string name)

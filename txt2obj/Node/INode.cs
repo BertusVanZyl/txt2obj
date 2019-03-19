@@ -16,5 +16,9 @@ namespace txt2obj.Node
         string Pattern { get; set; }
         string Target { get; set; }
         string FromVariable { get; set; }
+        string TargetVariable { get; set; }
+        string Format { get; set; }
+        string Setter { get; set; }
+        string Constant { get; set; }
     }
 }
