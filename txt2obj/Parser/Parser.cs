@@ -17,6 +17,8 @@ namespace txt2obj.Parser
         public Parser()
         {
             this.RegisterProcessor(new ToUpper());
+            this.RegisterProcessor(new ToLower());
+            this.RegisterProcessor(new Replace());
         }
         public ParserResult<T> Text2Object<T>(INode node, string text)
         {
@@ -86,6 +88,11 @@ namespace txt2obj.Parser
                         resultText = variable.Value;
                     }
                 }
+            }
+
+            if (!String.IsNullOrEmpty(node.Process))
+            {
+                resultText = this.StringProcessorHolder.ProcessAll(resultText, node.Process);
             }
 
             return resultText;

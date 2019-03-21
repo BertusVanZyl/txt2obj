@@ -26,6 +26,7 @@ namespace txt2obj.Node
         public string Format { get; set; }
         public string Setter { get; set; }
         public string Constant { get; set; }
+        public string Process { get; set; }
 
         public VariableHolder Variables = new VariableHolder();
 

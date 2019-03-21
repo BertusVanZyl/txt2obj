@@ -40,5 +40,46 @@ namespace txt2obj.test
             var result = h.ProcessAll("HELLO", processorstring);
             result.ShouldBe("HELLO12(3)A");
         }
+
+        [Fact]
+        public void ReplaceTest()
+        {
+            var node = new Node.Node
+            {
+                Process = "Replace(hello,goodbye)",
+                Target = "StringProperty"
+            };
+            var parser = new Parser.Parser();
+            var obj = parser.Text2Object<TestObj1>(node, "hello hello hello");
+            obj.Result.StringProperty.ShouldBe("goodbye goodbye goodbye");
+        }
+
+        [Fact]
+        public void ToUpperTest()
+        {
+            var node = new Node.Node
+            {
+                Process = "ToUpper()",
+                Target = "StringProperty"
+            };
+            var parser = new Parser.Parser();
+            var str = "hello hello hello";
+            var obj = parser.Text2Object<TestObj1>(node, str);
+            obj.Result.StringProperty.ShouldBe(str.ToUpper());
+        }
+
+        [Fact]
+        public void ToLowerTest()
+        {
+            var node = new Node.Node
+            {
+                Process = "ToLower()",
+                Target = "StringProperty"
+            };
+            var parser = new Parser.Parser();
+            var str = "UPPERCASE lowercase";
+            var obj = parser.Text2Object<TestObj1>(node, str);
+            obj.Result.StringProperty.ShouldBe(str.ToLower());
+        }
     }
 }

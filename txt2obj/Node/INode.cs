@@ -20,5 +20,6 @@ namespace txt2obj.Node
         string Format { get; set; }
         string Setter { get; set; }
         string Constant { get; set; }
+        string Process { get; set; }
     }
 }
