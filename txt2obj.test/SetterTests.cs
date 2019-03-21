@@ -31,7 +31,6 @@ namespace txt2obj.test
                         Target = "StringProperty"
                     }
                 }
-
             };
 
             var parser = new Parser.Parser();

@@ -6,11 +6,18 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using txt2obj.Node;
 using txt2obj.TextMatcher;
+using txt2obj.TextProcessing;
+using txt2obj.TextProcessing.Processors;
 
 namespace txt2obj.Parser
 {
     public class Parser : IParser
     {
+        private StringProcessorHolder StringProcessorHolder = new StringProcessorHolder();
+        public Parser()
+        {
+            this.RegisterProcessor(new ToUpper());
+        }
         public ParserResult<T> Text2Object<T>(INode node, string text)
         {
             node.Prepare();
@@ -193,6 +200,11 @@ namespace txt2obj.Parser
                 //context.JObj[node.Target] = newContext.JObj;
                 //context.Errors.AddRange(newContext.Errors);
             }
+        }
+
+        public void RegisterProcessor(IStringProcessor processor)
+        {
+            this.StringProcessorHolder.Add(processor);
         }
     }
 }
