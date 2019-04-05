@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Shouldly;
+using txt2obj.test.TestClasses;
 using txt2obj.TextProcessing;
 using txt2obj.TextProcessing.Processors;
 using Xunit;

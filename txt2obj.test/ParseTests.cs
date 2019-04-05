@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Shouldly;
+using txt2obj.test.TestClasses;
 using Xunit;
 
 namespace txt2obj.test

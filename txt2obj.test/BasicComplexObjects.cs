@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Shouldly;
+using txt2obj.test.TestClasses;
 using Xunit;
 
 namespace txt2obj.test
@@ -14,7 +15,6 @@ namespace txt2obj.test
             var str = "123456"; 
             var node = new Node.Node
             {
-                //Pattern = "he(?<v1>ll)o",
                 Target = "Complex1",
                 ChildNodes = new List<Node.INode>
                 {

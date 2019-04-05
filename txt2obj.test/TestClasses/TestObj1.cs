@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace txt2obj.test
+namespace txt2obj.test.TestClasses
 {
     public class TestObj1
     {

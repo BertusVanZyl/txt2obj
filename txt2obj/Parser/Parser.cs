@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
+using txt2obj.Extentions;
 using txt2obj.Node;
 using txt2obj.TextMatcher;
 using txt2obj.TextProcessing;
@@ -47,11 +48,11 @@ namespace txt2obj.Parser
         private string ProcessStringAgainstNode(INode node, string text)
         {
             var resultText = text;
-            if (!String.IsNullOrEmpty(node.Constant))
+            if (node.Constant.IsSet())
             {
                 resultText = node.Constant;
             }
-            if (!String.IsNullOrEmpty(node.Pattern))
+            if (node.Pattern.IsSet())
             {
                 ITextMatcher matcher = new RegexTextMatcher();
                 var matches = matcher.GetMatches(node.Pattern, text);
@@ -60,7 +61,7 @@ namespace txt2obj.Parser
                     node.SetVariable(match.Name, match.Value);
                 }
                 //if there is a match pattern, and no FromVariable, use the complete match
-                if (String.IsNullOrEmpty(node.FromVariable))
+                if (!node.FromVariable.IsSet())
                 {
                     var completeMatch = matches.FirstOrDefault(x => x.Name == "0");
                     if (completeMatch != null)
@@ -80,7 +81,7 @@ namespace txt2obj.Parser
             else
             {
                 //no pattern
-                if (!String.IsNullOrEmpty(node.FromVariable))
+                if (node.FromVariable.IsSet())
                 {
                     var variable = node.GetVariable(node.FromVariable);
                     if (variable != null)
@@ -111,7 +112,7 @@ namespace txt2obj.Parser
                 if (!String.IsNullOrEmpty(childNode.Pattern))
                 {
                     List<TextMatch> matches = null;
-                    if (!String.IsNullOrEmpty(childNode.FromVariable))
+                    if (childNode.FromVariable.IsSet())
                     {
                         matches = matchesForChildNode.Where(y => y.Name == childNode.FromVariable).ToList();
                     }
@@ -142,9 +143,9 @@ namespace txt2obj.Parser
         {
             var resultText = ProcessStringAgainstNode(node, text);
 
-            if (!String.IsNullOrEmpty(node.TargetVariable))
+            if (node.TargetVariable.IsSet())
             {
-                if (!String.IsNullOrEmpty(node.Setter))
+                if (node.Setter.IsSet())
                 {
                     var setterStr = node.Setter;
                     var targetVariable = node.GetVariable(node.TargetVariable);
@@ -163,14 +164,14 @@ namespace txt2obj.Parser
                 node.SetVariable(node.TargetVariable, resultText);
             }
             
-            if (!String.IsNullOrEmpty(node.Target))
+            if (node.Target.IsSet())
             {
                 var propertyType = Helpers.HelperMethods.GetTypePropertyOrFieldType(t, node.Target);
                 
                 if (Helpers.HelperMethods.IsSimple(propertyType))
                 {
                     //if datetime, attempt to use Format to standardise the datetime into ISO 8601
-                    if (!String.IsNullOrEmpty(node.Format) && Helpers.HelperMethods.IsDateTime(propertyType))
+                    if (node.Format.IsSet() && Helpers.HelperMethods.IsDateTime(propertyType))
                     {
                         resultText = Helpers.HelperMethods.StandardiseDateTime(resultText, node.Format, propertyType);
                     }

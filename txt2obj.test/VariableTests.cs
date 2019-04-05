@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Shouldly;
 using txt2obj.Node;
+using txt2obj.test.TestClasses;
 using txt2obj.Variables;
 using Xunit;
 
