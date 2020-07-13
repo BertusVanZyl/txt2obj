@@ -1,0 +1,5 @@
+﻿DATE: 2020-01-02 16:22:23
+LINE ITEMS START --->
+Jar of cookies 22 23.55 518.10
+Cigarettes 1 10.00 10.00
+<--- LINE ITEMS END

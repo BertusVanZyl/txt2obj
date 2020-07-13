@@ -13,6 +13,11 @@ namespace txt2obj.Variables
         private object _lockObj = new object();
         private Dictionary<string, Variable> VariableDic = new Dictionary<string, Variable>();
 
+        public int Count
+        {
+            get { return this.VariableDic.Count; }
+        }
+
         public Variable this[string key]
         {
             get
