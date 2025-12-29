@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
+using txt2obj.Helpers;
 using txt2obj.Variables;
 
 namespace txt2obj.Node
@@ -63,6 +64,73 @@ namespace txt2obj.Node
             foreach (var childNode in this.ChildNodes)
             {
                 childNode.Prepare(this);
+            }
+        }
+
+        public void Validate(Type rootType)
+        {
+            if (rootType == null)
+            {
+                throw new ArgumentNullException(nameof(rootType));
+            }
+
+            ValidateInternal(this, rootType);
+        }
+
+        private static void ValidateInternal(Node node, Type currentType)
+        {
+            if (node == null)
+            {
+                return;
+            }
+
+            var nextType = currentType;
+
+            if (!string.IsNullOrEmpty(node.Target))
+            {
+                var propertyType = HelperMethods.GetTypePropertyOrFieldType(currentType, node.Target);
+                if (propertyType == null)
+                {
+                    throw new InvalidOperationException($"Target '{node.Target}' was not found on type '{currentType.FullName}'.");
+                }
+
+                if (HelperMethods.IsCollection(propertyType))
+                {
+                    if (node.ChildNodes != null)
+                    {
+                        foreach (var childNode in node.ChildNodes)
+                        {
+                            if (string.IsNullOrEmpty(childNode.Pattern))
+                            {
+                                throw new InvalidOperationException($"Collection child node for target '{node.Target}' requires a non-empty Pattern.");
+                            }
+                        }
+                    }
+
+                    nextType = HelperMethods.GetCollectionType(propertyType);
+                    if (nextType == null)
+                    {
+                        throw new InvalidOperationException($"Collection target '{node.Target}' does not define an element type.");
+                    }
+                }
+                else if (!HelperMethods.IsSimple(propertyType))
+                {
+                    nextType = propertyType;
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            if (node.ChildNodes == null || node.ChildNodes.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var childNode in node.ChildNodes)
+            {
+                ValidateInternal(childNode, nextType);
             }
         }
     }

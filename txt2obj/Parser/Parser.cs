@@ -31,6 +31,7 @@ namespace txt2obj.Parser
         public ParserResult<T> Text2Object<T>(Node.Node node, string text)
         {
             node.Prepare();
+            node.Validate(typeof(T));
             var context = new ParseContext();
             ProcessNode(node, text, typeof(T),context);
             var obj = JsonSerializer.Deserialize<T>(context.JObj.ToJsonString(), SerializerOptions);
@@ -43,6 +44,7 @@ namespace txt2obj.Parser
         public ParserResult<T> Text2Object<T>(Node.Node node, string text, T obj)
         {
             node.Prepare();
+            node.Validate(typeof(T));
             var context = new ParseContext();
             ProcessNode(node, text, typeof(T),context);
             var o = JsonSerializer.Deserialize<T>(context.JObj.ToJsonString(), SerializerOptions);
@@ -115,9 +117,9 @@ namespace txt2obj.Parser
             foreach (var childNode in node.ChildNodes)
             {
                 var collectionSubTypeContext = new ParseContext();
-                var matchesForChildNode = matcher.GetMatches(childNode.Pattern, text);
                 if (!String.IsNullOrEmpty(childNode.Pattern))
                 {
+                    var matchesForChildNode = matcher.GetMatches(childNode.Pattern, text);
                     List<TextMatch> matches = null;
                     if (childNode.FromVariable.IsSet())
                     {
