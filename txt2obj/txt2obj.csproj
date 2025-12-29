@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>txt2obj</PackageId>
     <Version>1.0.2</Version>
@@ -12,6 +11,7 @@
     <PackageProjectUrl>https://github.com/BertusVanZyl/txt2obj</PackageProjectUrl>
     <Copyright>2019</Copyright>
     <Description>A library that allows you to organise regular expressions into a tree sturcture, and run them against text where the result is an object.</Description>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
