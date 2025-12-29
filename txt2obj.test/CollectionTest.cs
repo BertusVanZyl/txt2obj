@@ -17,7 +17,7 @@ namespace txt2obj.test
             var node = new Node.Node
             {
                 Target = "ListProperty",
-                ChildNodes = new List<Node.INode>
+                ChildNodes = new List<Node.Node>
                 {
                     new Node.Node
                     {
@@ -42,7 +42,7 @@ namespace txt2obj.test
             var node = new Node.Node
             {
                 Target = "ListProperty",
-                ChildNodes = new List<Node.INode>
+                ChildNodes = new List<Node.Node>
                 {
                     new Node.Node
                     {
@@ -66,7 +66,7 @@ namespace txt2obj.test
             var node = new Node.Node
             {
                 Target = "ArrayProperty",
-                ChildNodes = new List<Node.INode>
+                ChildNodes = new List<Node.Node>
                 {
                     new Node.Node
                     {
@@ -90,7 +90,7 @@ namespace txt2obj.test
             var node = new Node.Node
             {
                 Target = "ArrayProperty",
-                ChildNodes = new List<Node.INode>
+                ChildNodes = new List<Node.Node>
                 {
                     new Node.Node
                     {

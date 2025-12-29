@@ -25,7 +25,7 @@ namespace txt2obj.test
             var parentNode = new Node.Node
             {   
                 Comment ="parentnode",
-                ChildNodes = new List<Node.INode>
+                ChildNodes = new List<Node.Node>
                 {
                     childNode
                 }
@@ -39,11 +39,11 @@ namespace txt2obj.test
         [Fact]
         public async Task TargetVariable01()
         {
-            INode node = new Node.Node
+            var node = new Node.Node
             {
                 Constant = "C1",
                 TargetVariable = "Var1",
-                ChildNodes = new List<INode>
+                ChildNodes = new List<Node.Node>
                 {
                     new Node.Node
                     {

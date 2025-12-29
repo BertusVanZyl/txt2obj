@@ -21,7 +21,7 @@ namespace txt2obj.Parser
             this.RegisterProcessor(new ToLower());
             this.RegisterProcessor(new Replace());
         }
-        public ParserResult<T> Text2Object<T>(INode node, string text)
+        public ParserResult<T> Text2Object<T>(Node.Node node, string text)
         {
             node.Prepare();
             var context = new ParseContext();
@@ -33,7 +33,7 @@ namespace txt2obj.Parser
             };
         }
 
-        public ParserResult<T> Text2Object<T>(INode node, string text, T obj)
+        public ParserResult<T> Text2Object<T>(Node.Node node, string text, T obj)
         {
             node.Prepare();
             var context = new ParseContext();
@@ -45,7 +45,7 @@ namespace txt2obj.Parser
             };
         }
 
-        private string ProcessStringAgainstNode(INode node, string text)
+        private string ProcessStringAgainstNode(Node.Node node, string text)
         {
             var resultText = text;
             if (node.Constant.IsSet())
@@ -99,7 +99,7 @@ namespace txt2obj.Parser
             return resultText;
         }
 
-        private void ProcessCollection(INode node, string text, Type t, ParseContext context)
+        private void ProcessCollection(Node.Node node, string text, Type t, ParseContext context)
         {
             var jArray = new JArray();
             List<Tuple<int,JObject>> objectsByIndex = new List<Tuple<int,JObject>>();
@@ -139,7 +139,7 @@ namespace txt2obj.Parser
             context.JObj[node.Target] = jArray;
         }
 
-        private void ProcessNode(INode node, string text, Type t, ParseContext context)
+        private void ProcessNode(Node.Node node, string text, Type t, ParseContext context)
         {
             var resultText = ProcessStringAgainstNode(node, text);
 

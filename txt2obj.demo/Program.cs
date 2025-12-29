@@ -8,21 +8,13 @@ using txt2obj.Node;
 using Newtonsoft.Json.Serialization;
 using System.Collections;
 using txt2obj.Variables;
+using YamlDotNet.Serialization;
 
 namespace txt2obj.demo
 {
     class Program
     {
-        private static string GetResource(string name)
-        {
-            var assembly = typeof(Program).GetTypeInfo().Assembly;
-            var ttt1 = assembly.GetManifestResourceNames();
-            var resourceName = assembly.GetManifestResourceNames().First(x => x.Contains(name));
-            Stream resource = assembly.GetManifestResourceStream(resourceName);
-            var memoryStream = new MemoryStream();
-            resource.CopyTo(memoryStream);
-            return System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer());
-        }
+        
 
         public class SlipModel
         {
@@ -60,95 +52,43 @@ namespace txt2obj.demo
                 return property;
             }
         }
+
         static void Main(string[] args)
         {
-            var sourceString = GetResource("slip1");
-
-            var template = new Node.Node
-            {
-                ChildNodes = new List<INode>
-                {
-                    new Node.Node
-                    {
-                        Comment = "Parse the transaction date time",
-                        Pattern = @"(?<datepart>\d\d\d\d-\d\d-\d\d) (?<timepart>\d\d:\d\d:\d\d)",
-                        ChildNodes = new List<INode>
-                        {
-                            new Node.Node
-                            {
-                                Comment = "Save the date part into a new variable called dateandtimecombimed",
-                                TargetVariable = "dateandtimecombimed",
-                                FromVariable = "datepart"
-                            },
-                            new Node.Node()
-                            {
-                                Comment = "Take the value from timepart, and append it to dateandtimecombimed, using a setter",
-                                TargetVariable = "dateandtimecombimed",
-                                FromVariable = "timepart",
-                                Setter = "|OLD| |NEW|"
-                            },
-                            new Node.Node()
-                            {
-                                Comment = "Write the value from dateandtimecombimed into the result model",
-                                Target = "TransactionTime",
-                                FromVariable = "dateandtimecombimed",
-                                Format = "yyyy-MM-dd HH:mm:ss"
-                            }
-                        }
-                    },
-                    new Node.Node()
-                    {
-                        Comment = "Grab the part of the slip that contains the line items.",
-                        Pattern = "LINE ITEMS START --->(?<lineitemssection>.*?)<--- LINE ITEMS END",
-                        Target = "LineItems",
-                        ChildNodes = new List<INode>
-                        {
-                            new Node.Node
-                            {
-                                Pattern = @"(?<desc>[^\n\r]+)(?<quantity>\d+?) (?<unitprice>\d+\.\d\d?) (?<linetotal>\d+\.\d\d?)",
-                                ChildNodes = new List<INode>
-                                {
-                                    new Node.Node
-                                    {
-                                        Target = "Description",
-                                        FromVariable = "desc"
-                                    },
-                                    new Node.Node
-                                    {
-                                        Target = "Quantity",
-                                        FromVariable = "quantity"
-                                    },
-                                    new Node.Node
-                                    {
-                                        Target = "UnitPrice",
-                                        FromVariable = "unitprice"
-                                    },
-                                    new Node.Node
-                                    {
-                                        Target = "LineTotal",
-                                        FromVariable = "linetotal"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-
-            var templateJson = JsonConvert.SerializeObject(template,
-                Newtonsoft.Json.Formatting.Indented,
-                new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore,
-                    ContractResolver = new ShouldSerializeContractResolver()
-                    
-                });
-
             var parser = new Parser.Parser();
-            var resultSlip = parser.Text2Object<SlipModel>(template, sourceString).Result;
+            var sourceString = GetResource("slip1");
+            var json_template = GetResource("template1.json");
+            var template = JsonConvert.DeserializeObject<Node.Node>(json_template);
+            var resultSlip_from_json = parser.Text2Object<SlipModel>(template, sourceString).Result;
 
+            var yaml_template = GetResource("template1.yaml");
+            var yamlDeserializer = new DeserializerBuilder().Build();
+            var template_from_yaml = yamlDeserializer.Deserialize<Node.Node>(yaml_template);
+            var resultSlip_from_yaml = parser.Text2Object<SlipModel>(template_from_yaml, sourceString).Result;
+        }
+        
+        /// <summary>
+        /// Retrieves the content of an embedded resource specified by name from the assembly containing the 'Program' class.
+        /// </summary>
+        /// <param name="name">Part of the name of the resource to find.</param>
+        /// <returns>Content of the resource as a UTF-8 encoded string.</returns>
+        private static string GetResource(string name)
+        {
+            var assembly = typeof(Program).GetTypeInfo().Assembly;
+            var resourceNames = assembly.GetManifestResourceNames().ToList();
 
+            var resourceName = resourceNames
+                .FirstOrDefault(x => x.EndsWith(name, StringComparison.OrdinalIgnoreCase))
+                ?? resourceNames.FirstOrDefault(x => x.Contains(name, StringComparison.OrdinalIgnoreCase));
 
+            if (resourceName == null)
+            {
+                throw new InvalidOperationException($"Resource not found for '{name}'.");
+            }
+            Stream resource = assembly.GetManifestResourceStream(resourceName);
+            var memoryStream = new MemoryStream();
+            resource.CopyTo(memoryStream);
+            return System.Text.Encoding.UTF8.GetString(memoryStream.GetBuffer());
         }
     }
 }

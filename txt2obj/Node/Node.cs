@@ -8,14 +8,14 @@ using txt2obj.Variables;
 
 namespace txt2obj.Node
 {
-    public class Node : INode
+    public class Node
     {
         public Node()
         {
-            this.ChildNodes = new List<INode>();
+            this.ChildNodes = new List<Node>();
         }
         private object _lockObj = new object();
-        public List<INode> ChildNodes { get; set; }
+        public List<Node> ChildNodes { get; set; }
     
         public Node ParentNode { get; set; }
         public string Comment { get; set; }
@@ -55,14 +55,14 @@ namespace txt2obj.Node
             this.ParentNode = parentNode;
             foreach (var childNode in this.ChildNodes)
             {
-                ((Node)childNode).Prepare(this);
+                childNode.Prepare(this);
             }
         }
         public void Prepare()
         {
             foreach (var childNode in this.ChildNodes)
             {
-                ((Node)childNode).Prepare(this);
+                childNode.Prepare(this);
             }
         }
     }

@@ -1,10 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace txt2obj.demo
 {
-    class template1
+  "ChildNodes": [
     {
+      "Comment": "Parse the transaction date time",
+      "Pattern": "(?<datepart>\\d\\d\\d\\d-\\d\\d-\\d\\d) (?<timepart>\\d\\d:\\d\\d:\\d\\d)",
+      "ChildNodes": [
+        {
+          "Comment": "Save the date part into a new variable called dateandtimecombined",
+          "TargetVariable": "dateandtimecombined",
+          "FromVariable": "datepart"
+        },
+        {
+          "Comment": "Take the value from timepart, and append it to dateandtimecombimed, using a setter",
+          "TargetVariable": "dateandtimecombimed",
+          "FromVariable": "timepart",
+          "Setter": "|OLD| |NEW|"
+        },
+        {
+          "Comment": "Write the value from dateandtimecombimed into the result model",
+          "Target": "TransactionTime",
+          "FromVariable": "dateandtimecombimed",
+          "Format": "yyyy-MM-dd HH:mm:ss"
+        }
+      ]
+    },
+    {
+      "Comment": "Grab the part of the slip that contains the line items.",
+      "Pattern": "LINE ITEMS START --->(?<lineitemssection>.*?)<--- LINE ITEMS END",
+      "Target": "LineItems",
+      "ChildNodes": [
+        {
+          "Pattern": "(?<desc>[^\\n\\r]+)(?<quantity>\\d+?) (?<unitprice>\\d+\\.\\d\\d?) (?<linetotal>\\d+\\.\\d\\d?)",
+          "ChildNodes": [
+            {
+              "Target": "Description",
+              "FromVariable": "desc"
+            },
+            {
+              "Target": "Quantity",
+              "FromVariable": "quantity"
+            },
+            {
+              "Target": "UnitPrice",
+              "FromVariable": "unitprice"
+            },
+            {
+              "Target": "LineTotal",
+              "FromVariable": "linetotal"
+            }
+          ]
+        }
+      ]
     }
+  ]
 }

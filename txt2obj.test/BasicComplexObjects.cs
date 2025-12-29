@@ -16,7 +16,7 @@ namespace txt2obj.test
             var node = new Node.Node
             {
                 Target = "Complex1",
-                ChildNodes = new List<Node.INode>
+                ChildNodes = new List<Node.Node>
                 {
                     new Node.Node
                     {

@@ -18,7 +18,7 @@ namespace txt2obj.test
             var node = new Node.Node
             {
                 Pattern = "(?<v1>.*)",
-                ChildNodes = new List<INode>
+                ChildNodes = new List<Node.Node>
                 {
                     new Node.Node
                     {
