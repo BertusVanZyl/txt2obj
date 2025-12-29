@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using txt2obj.Helpers;
+using txt2obj.TextProcessing;
 using txt2obj.Variables;
 
 namespace txt2obj.Node
@@ -69,15 +70,20 @@ namespace txt2obj.Node
 
         public void Validate(Type rootType)
         {
+            Validate(rootType, null);
+        }
+
+        public void Validate(Type rootType, StringProcessorHolder stringProcessorHolder)
+        {
             if (rootType == null)
             {
                 throw new ArgumentNullException(nameof(rootType));
             }
 
-            ValidateInternal(this, rootType);
+            ValidateInternal(this, rootType, stringProcessorHolder);
         }
 
-        private static void ValidateInternal(Node node, Type currentType)
+        private static void ValidateInternal(Node node, Type currentType, StringProcessorHolder stringProcessorHolder)
         {
             if (node == null)
             {
@@ -85,6 +91,15 @@ namespace txt2obj.Node
             }
 
             var nextType = currentType;
+
+            if (!string.IsNullOrEmpty(node.Process) && stringProcessorHolder != null)
+            {
+                var processors = stringProcessorHolder.CreateProcessorList(node.Process);
+                if (processors == null || processors.Count == 0)
+                {
+                    throw new InvalidOperationException($"Process string '{node.Process}' is invalid.");
+                }
+            }
 
             if (!string.IsNullOrEmpty(node.Target))
             {
@@ -130,7 +145,7 @@ namespace txt2obj.Node
 
             foreach (var childNode in node.ChildNodes)
             {
-                ValidateInternal(childNode, nextType);
+                ValidateInternal(childNode, nextType, stringProcessorHolder);
             }
         }
     }

@@ -40,5 +40,20 @@ namespace txt2obj.test
 
             Assert.Throws<InvalidOperationException>(() => parser.Text2Object<TestObj1>(node, "abc"));
         }
+
+        [Fact]
+        public void ProcessStringMustBeValid()
+        {
+            var node = new Node.Node
+            {
+                Pattern = "(.*)",
+                Target = "StringProperty",
+                Process = "ToUpper("
+            };
+
+            var parser = new Parser.Parser();
+
+            Assert.Throws<InvalidOperationException>(() => parser.Text2Object<TestObj1>(node, "abc"));
+        }
     }
 }

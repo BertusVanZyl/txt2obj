@@ -31,7 +31,7 @@ namespace txt2obj.Parser
         public ParserResult<T> Text2Object<T>(Node.Node node, string text)
         {
             node.Prepare();
-            node.Validate(typeof(T));
+            node.Validate(typeof(T), this.StringProcessorHolder);
             var context = new ParseContext();
             ProcessNode(node, text, typeof(T),context);
             var obj = JsonSerializer.Deserialize<T>(context.JObj.ToJsonString(), SerializerOptions);
@@ -44,7 +44,7 @@ namespace txt2obj.Parser
         public ParserResult<T> Text2Object<T>(Node.Node node, string text, T obj)
         {
             node.Prepare();
-            node.Validate(typeof(T));
+            node.Validate(typeof(T), this.StringProcessorHolder);
             var context = new ParseContext();
             ProcessNode(node, text, typeof(T),context);
             var o = JsonSerializer.Deserialize<T>(context.JObj.ToJsonString(), SerializerOptions);
