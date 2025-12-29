@@ -6,7 +6,7 @@
 
 - **Tree-based templates** - compose complex parsers by nesting `Node` instances that mirror the layout of the target object graph.
 - **Variable plumbing** - capture portions of text into named variables, reuse them in descendant nodes, and mutate them with setters.
-- **Typed projection** - final output is deserialized into any CLR type via Newtonsoft.Json, so primitives, complex objects, and collections are supported out of the box.
+- **Typed projection** - final output is deserialized into any CLR type via `System.Text.Json`, so primitives, complex objects, and collections are supported out of the box.
 - **Processing pipeline** - attach dot-chained processors (`ToUpper`, `Replace`, `ToLower`, or custom ones) to normalize data before assignment.
 - **Date formatting helpers** - standardize captured strings into ISO-8601 `DateTime` values using the `Format` property.
 - **Collection handling** - child nodes can emit repeated matches that are automatically grouped into lists or arrays based on your model.
@@ -17,7 +17,7 @@
 dotnet add package txt2obj
 ```
 
-The package targets .NET 8.0 and depends only on `Newtonsoft.Json`.
+The package targets .NET 8.0 and depends only on the .NET runtime.
 
 ## Quick Start
 
@@ -228,7 +228,7 @@ Once registered, `Process = "Trim()"` becomes available to every node handled by
 
 ## Collections & Complex Types
 
-When a node targets a complex property (non-collection), its `ChildNodes` are executed against the node's output text and the resulting `JObject` is assigned to the property. If the property is an `IEnumerable`, array, or `List`, `txt2obj` automatically:
+When a node targets a complex property (non-collection), its `ChildNodes` are executed against the node's output text and the resulting `JsonObject` is assigned to the property. If the property is an `IEnumerable`, array, or `List`, `txt2obj` automatically:
 
 1. Determines the element type via reflection.
 2. Runs each child node independently against the collection node's input text (not the collection node's own `Pattern`/`Process` output).

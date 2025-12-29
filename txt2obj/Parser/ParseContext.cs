@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace txt2obj.Parser
 {
@@ -9,9 +9,9 @@ namespace txt2obj.Parser
     {
         public ParseContext()
         {
-            JObj = new JObject();
+            JObj = new JsonObject();
         }
-        public JObject JObj { get; set; }
+        public JsonObject JObj { get; set; }
         public List<ParseError> Errors = new List<ParseError>();
     }
 }

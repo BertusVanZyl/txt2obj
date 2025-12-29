@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using txt2obj.Extentions;
 using txt2obj.Node;
 using txt2obj.TextMatcher;
@@ -15,6 +17,11 @@ namespace txt2obj.Parser
     public class Parser : IParser
     {
         private StringProcessorHolder StringProcessorHolder = new StringProcessorHolder();
+        private static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            IncludeFields = true
+        };
         public Parser()
         {
             this.RegisterProcessor(new ToUpper());
@@ -26,7 +33,7 @@ namespace txt2obj.Parser
             node.Prepare();
             var context = new ParseContext();
             ProcessNode(node, text, typeof(T),context);
-            var obj = context.JObj.ToObject<T>();
+            var obj = JsonSerializer.Deserialize<T>(context.JObj.ToJsonString(), SerializerOptions);
             return new ParserResult<T>
             {
                 Result = obj
@@ -38,7 +45,7 @@ namespace txt2obj.Parser
             node.Prepare();
             var context = new ParseContext();
             ProcessNode(node, text, typeof(T),context);
-            var o = context.JObj.ToObject<T>();
+            var o = JsonSerializer.Deserialize<T>(context.JObj.ToJsonString(), SerializerOptions);
             return new ParserResult<T>
             {
                 Result = o
@@ -99,10 +106,10 @@ namespace txt2obj.Parser
             return resultText;
         }
 
-        private void ProcessCollection(Node.Node node, string text, Type t, ParseContext context)
+        private JsonArray ProcessCollection(Node.Node node, string text, Type t)
         {
-            var jArray = new JArray();
-            List<Tuple<int,JObject>> objectsByIndex = new List<Tuple<int,JObject>>();
+            var jArray = new JsonArray();
+            List<Tuple<int,JsonObject>> objectsByIndex = new List<Tuple<int,JsonObject>>();
             ITextMatcher matcher = new RegexTextMatcher();
             var collectionType = Helpers.HelperMethods.GetCollectionType(t);
             foreach (var childNode in node.ChildNodes)
@@ -125,7 +132,7 @@ namespace txt2obj.Parser
                     {
                         var itemContext = new ParseContext();
                         ProcessNode(childNode, match.Value, collectionType, itemContext);
-                        objectsByIndex.Add(new Tuple<int,JObject>(match.Position, itemContext.JObj));
+                        objectsByIndex.Add(new Tuple<int,JsonObject>(match.Position, itemContext.JObj));
                     }
                 }
             }
@@ -135,8 +142,7 @@ namespace txt2obj.Parser
             {
                 jArray.Add(jobj);
             }
-            
-            context.JObj[node.Target] = jArray;
+            return jArray;
         }
 
         private void ProcessNode(Node.Node node, string text, Type t, ParseContext context)
@@ -176,7 +182,7 @@ namespace txt2obj.Parser
                         resultText = Helpers.HelperMethods.StandardiseDateTime(resultText, node.Format, propertyType);
                     }
                     //simple object, just add text
-                    context.JObj[node.Target] = resultText;
+                    context.JObj[node.Target] = CreateSimpleNode(propertyType, resultText);
                 }
                 else
                 {
@@ -184,8 +190,8 @@ namespace txt2obj.Parser
                     //complex object, start new Jobj
                     if (Helpers.HelperMethods.IsCollection(propertyType))
                     {
-                        ProcessCollection(node, text, propertyType, newContext);
-                        context.JObj[node.Target] = newContext.JObj[node.Target];
+                        var collectionArray = ProcessCollection(node, text, propertyType);
+                        context.JObj[node.Target] = collectionArray;
                     }
                     else
                     {
@@ -213,6 +219,80 @@ namespace txt2obj.Parser
         public void RegisterProcessor(IStringProcessor processor)
         {
             this.StringProcessorHolder.Add(processor);
+        }
+
+        private static JsonNode CreateSimpleNode(Type propertyType, string value)
+        {
+            if (value == null)
+            {
+                return JsonValue.Create((string)null);
+            }
+
+            var targetType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+
+            if (targetType == typeof(string))
+            {
+                return JsonValue.Create(value);
+            }
+
+            if (targetType == typeof(Guid))
+            {
+                if (Guid.TryParse(value, out var guidValue))
+                {
+                    return JsonValue.Create(guidValue);
+                }
+                return JsonValue.Create(value);
+            }
+
+            if (targetType == typeof(DateTime))
+            {
+                if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dateValue))
+                {
+                    return JsonValue.Create(dateValue);
+                }
+                return JsonValue.Create(value);
+            }
+
+            if (targetType == typeof(DateTimeOffset))
+            {
+                if (DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dateValue))
+                {
+                    return JsonValue.Create(dateValue);
+                }
+                return JsonValue.Create(value);
+            }
+
+            if (targetType == typeof(TimeSpan))
+            {
+                if (TimeSpan.TryParse(value, CultureInfo.InvariantCulture, out var timeValue))
+                {
+                    return JsonValue.Create(timeValue);
+                }
+                return JsonValue.Create(value);
+            }
+
+            if (targetType.IsEnum)
+            {
+                try
+                {
+                    var enumValue = Enum.Parse(targetType, value, true);
+                    return JsonValue.Create(enumValue);
+                }
+                catch
+                {
+                    return JsonValue.Create(value);
+                }
+            }
+
+            try
+            {
+                var converted = Convert.ChangeType(value, targetType, CultureInfo.InvariantCulture);
+                return JsonValue.Create(converted);
+            }
+            catch
+            {
+                return JsonValue.Create(value);
+            }
         }
     }
 }
