@@ -32,3 +32,6 @@ msbuild.wrn
 
 # Visual Studio 2015
 .vs/
+/.idea/.idea.txt2obj/.idea/encodings.xml
+/.idea/.idea.txt2obj/.idea/indexLayout.xml
+/.idea/.idea.txt2obj/.idea/vcs.xml
